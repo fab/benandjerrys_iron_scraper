@@ -1,3 +1,4 @@
+require_relative "iron_scraper_dev.rb" unless ARGV.include?("-id")
 require 'mechanize'
 require 'csv'
 require 'pg'
