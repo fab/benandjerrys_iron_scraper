@@ -10,6 +10,7 @@ def setup
   @agent = Mechanize.new
   @page = @agent.get('http://m.benjerry.com/flavor-locator')
   @flavor_form = @page.forms.first
+  @start_time = Time.now
   setup_database
 end
 
@@ -88,6 +89,9 @@ def run_scraper(zip_codes_filename)
   setup
   zip_codes = create_zip_code_array(zip_codes_filename, params['start'], params['end'])
   iterate_over_zip_codes(zip_codes)
+  Store.where("created_at > ?", @start_time).each do |store|
+    puts "#{store.name}, #{store.address}, #{store.flavors.map(&:name).join(', ')}"
+  end
 end
 
 run_scraper('zip_codes.csv')
