@@ -1,6 +1,9 @@
 require 'mechanize'
 require 'csv'
 
+require './models/store.rb'
+require './models/flavor.rb'
+
 def setup
   @agent = Mechanize.new
   @page = @agent.get('http://m.benjerry.com/flavor-locator')
