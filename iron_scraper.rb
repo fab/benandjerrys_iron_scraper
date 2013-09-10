@@ -10,7 +10,13 @@ def setup
   @agent = Mechanize.new
   @page = @agent.get('http://m.benjerry.com/flavor-locator')
   @flavor_form = @page.forms.first
-  @stores_array = []
+  setup_database
+end
+
+def setup_database
+  return unless params['database']
+  puts "Database connection details: #{params['database'].inspect}"
+  ActiveRecord::Base.establish_connection(params['database'])
 end
 
 def create_zip_code_array(filename, start_num, end_num)
@@ -32,17 +38,22 @@ def iterate_over_links(page, flavor_name)
     break if link.href == nil
     if store_entry?(link)
       store_details = link.text.strip.gsub("\r\n", '').squeeze("\t").split("\t")
-      push_entry_into_stores_array(store_details, flavor_name)
+      create_or_modify_store_entry(store_details, flavor_name)
     end
   end
 end
 
-def push_entry_into_stores_array(store_details, flavor_name)
+def create_or_modify_store_entry(store_details, flavor_name)
   name = store_details.first
   street = store_details[1]
   city = store_details[2].slice(/\D+/)[0..-2]
   zip = store_details[2].slice(/\d+/)
-  @stores_array << [name, "#{street}, #{city} #{zip}", flavor_name]
+
+  store = Store.where(:address => "#{street}, #{city} #{zip}").first_or_create
+  store.update_attribute(:name, name)
+
+  flavor = Flavor.where(:name => flavor_name).first_or_create
+  store.flavors << flavor
 end
 
 def iterate_over_flavors(flavor_options)
@@ -67,14 +78,6 @@ def iterate_over_zip_codes(zip_codes)
   end
 end
 
-def create_unique_stores_hash
-  uniq_stores = Hash.new { |hash, key| hash[key] = []}
-  @stores_array.each do |store|
-    uniq_stores[store[0..1]] << store[-1]
-  end
-  uniq_stores
-end
-
 def ensure_unique_flavors(uniq_stores)
   uniq_stores.each do |k, v|
     uniq_stores[k].uniq!
@@ -85,12 +88,6 @@ def run_scraper(zip_codes_filename)
   setup
   zip_codes = create_zip_code_array(zip_codes_filename, params['start'], params['end'])
   iterate_over_zip_codes(zip_codes)
-  uniq_stores = create_unique_stores_hash
-  ensure_unique_flavors(uniq_stores)
-  uniq_stores.each do |store, flavors|
-      flavor_list = flavors.join(', ')
-      puts "#{store[0]}, #{store[1]}, #{flavor_list}"
-  end
 end
 
 run_scraper('zip_codes.csv')
