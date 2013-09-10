@@ -1,5 +1,7 @@
 require 'mechanize'
 require 'csv'
+require 'pg'
+require 'active_record'
 
 require './models/store.rb'
 require './models/flavor.rb'
