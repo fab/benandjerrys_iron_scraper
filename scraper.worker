@@ -3,10 +3,9 @@ runtime 'ruby'
 gem 'mechanize'
 gem 'pg'
 gem 'activerecord'
+gem 'iron_mq'
 
 dir 'models'
-
-file 'zip_codes.csv'
 
 exec 'iron_scraper.rb'
 

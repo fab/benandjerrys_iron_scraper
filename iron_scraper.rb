@@ -3,6 +3,7 @@ require 'mechanize'
 require 'csv'
 require 'pg'
 require 'active_record'
+require 'iron_mq'
 
 require './models/store.rb'
 require './models/flavor.rb'
@@ -22,12 +23,15 @@ def setup_database
   ActiveRecord::Base.establish_connection(params['database'])
 end
 
-def create_zip_code_array(filename, start_num, end_num)
+def create_zip_code_array
   zip_codes = []
-  csv = CSV.read(filename)
-  csv[start_num..end_num].each do |zip_code|
-    zip_codes << zip_code.first
+  ironmq = IronMQ::Client.new(:token => params['token'], :project_id => params['project'])
+  queue = ironmq.queue('zip_codes')
+  messages = queue.get(:n => 5)
+  messages.each do |zip_code|
+    zip_codes << zip_code
   end
+  messages.delete
   p zip_codes
 end
 
@@ -87,13 +91,13 @@ def ensure_unique_flavors(uniq_stores)
   end
 end
 
-def run_scraper(zip_codes_filename)
+def run_scraper
   setup
-  zip_codes = create_zip_code_array(zip_codes_filename, params['start'], params['end'])
+  zip_codes = create_zip_code_array
   iterate_over_zip_codes(zip_codes)
   Store.where("created_at > ?", @start_time).each do |store|
     puts "#{store.name}, #{store.address}, #{store.flavors.map(&:name).join(', ')}"
   end
 end
 
-run_scraper('zip_codes.csv')
+run_scraper
