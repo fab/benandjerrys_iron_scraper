@@ -9,6 +9,7 @@ require './models/flavor.rb'
 
 def setup
   @agent = Mechanize.new
+  @agent.idle_timeout = 1
   @page = @agent.get('http://m.benjerry.com/flavor-locator')
   @flavor_form = @page.forms.first
   @start_time = Time.now
