@@ -55,7 +55,7 @@ def create_or_modify_store_entry(store_details, flavor_name)
   store.update_attribute(:name, name)
 
   flavor = Flavor.where(:name => flavor_name).first_or_create
-  store.flavors << flavor
+  store.flavors << flavor unless store.flavors.include?(flavor)
 end
 
 def iterate_over_flavors(flavor_options)
