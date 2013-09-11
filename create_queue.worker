@@ -1,0 +1,7 @@
+runtime 'ruby'
+
+gem 'iron_mq'
+
+file 'zip_codes.csv'
+
+exec 'zip_codes_queue.rb'
