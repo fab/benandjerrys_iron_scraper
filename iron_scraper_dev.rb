@@ -6,9 +6,9 @@ end
 
 def params
   {
-    "database" => database_config["development"],
-    'start' => 40782,
-    'end' => 40782
+    'database' => database_config['development'],
+    'start' => 0,
+    'end' => 4
   }
 end
 
