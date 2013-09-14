@@ -28,10 +28,10 @@ def create_zip_code_array
   ironmq = IronMQ::Client.new(:token => params['token'], :project_id => params['project'])
   queue = ironmq.queue('zip_codes')
   messages = queue.get(:n => 5)
-  messages.each do |zip_code|
-    zip_codes << zip_code
+  messages.each do |message|
+    zip_codes << message.body
+    message.delete
   end
-  messages.delete
   p zip_codes
 end
 
