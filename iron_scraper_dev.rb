@@ -7,8 +7,8 @@ end
 def params
   {
     'database' => database_config['development'],
-    'start' => 0,
-    'end' => 4
+    'token' => ENV['IRON_TOKEN'],
+    'project' => ENV['IRON_PROJECT_ID']
   }
 end
 
