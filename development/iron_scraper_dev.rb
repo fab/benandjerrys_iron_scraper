@@ -1,7 +1,7 @@
 require 'yaml'
 
 def database_config
-  YAML.load(File.read('database.yml'))
+  YAML.load(File.open(File.expand_path('../../database.yml', __FILE__)))
 end
 
 def params
