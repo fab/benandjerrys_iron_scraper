@@ -85,12 +85,6 @@ def iterate_over_zip_codes(zip_codes)
   end
 end
 
-def ensure_unique_flavors(uniq_stores)
-  uniq_stores.each do |k, v|
-    uniq_stores[k].uniq!
-  end
-end
-
 def run_scraper
   setup
   zip_codes = create_zip_code_array
