@@ -1,3 +1,4 @@
+require_relative 'development/flavor_scraper_dev.rb' unless ARGV.include?('-id')
 require 'mechanize'
 require 'pg'
 require 'active_record'
