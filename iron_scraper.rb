@@ -68,7 +68,7 @@ def create_or_modify_store_entry(store_details, flavor_name)
 end
 
 def iterate_over_flavors(flavor_options)
-  flavors = flavor_options[4..8] + flavor_options[10..-16]
+  flavors = flavor_options[4..8] + flavor_options[12..-16]
   flavors.each do |flavor_option|
     @selectlist.value = flavor_option.value
     flavor_name = flavor_option.text.slice(/(?<=- ).*/)
