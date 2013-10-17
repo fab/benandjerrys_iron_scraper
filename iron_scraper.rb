@@ -53,10 +53,13 @@ end
 def create_or_modify_store_entry(store_details, flavor_name)
   name = store_details.first
   street = store_details[1]
-  city = store_details[2].slice(/\D+/)[0..-2]
-  zip = store_details[2].slice(/\d+/)
+  city, state = store_details[2].slice(/\D+/)[0..-2].split(/,\W/)
+  zipcode = store_details[2].slice(/\d+/)
 
-  store = Store.where(:address => "#{street}, #{city} #{zip}").first_or_create
+  store = Store.where(:street => street,
+                      :city => city,
+                      :state => state,
+                      :zipcode => zipcode).first_or_create
   store.update_attribute(:name, name)
 
   flavor = Flavor.where(:name => flavor_name).first_or_create
