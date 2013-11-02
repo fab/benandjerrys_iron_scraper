@@ -23,14 +23,13 @@ def setup_database
   ActiveRecord::Base.establish_connection(params['database'])
 end
 
-def create_zip_code_array
-  zip_codes = []
+def create_zip_code_hash
+  zip_codes = {}
   ironmq = IronMQ::Client.new(:token => params['token'], :project_id => params['project'])
-  queue = ironmq.queue('zip_codes')
-  messages = queue.get(:n => 5)
+  @queue = ironmq.queue('zip_codes')
+  messages = @queue.get(:n => 5)
   messages.each do |message|
-    zip_codes << message.body
-    message.delete
+    zip_codes[message.body] = message.id
   end
   p zip_codes
 end
@@ -83,18 +82,20 @@ end
 
 def iterate_over_zip_codes(zip_codes)
   total_zip_codes = zip_codes.length
-  zip_codes.each_with_index do |zip_code, index|
+  zip_codes.keys.each_with_index do |zip_code, index|
     @flavor_form.locatorZip = zip_code
     puts "Scraping stores for zip code (#{index + 1}/#{total_zip_codes}): #{zip_code}"
     @selectlist = @flavor_form.field_with(:name => "locatorFlavor_r")
     flavor_options = @selectlist.options
     iterate_over_flavors(flavor_options)
+    message_id = zip_codes[zip_code]
+    @queue.delete(message_id)
   end
 end
 
 def run_scraper
   setup
-  zip_codes = create_zip_code_array
+  zip_codes = create_zip_code_hash
   iterate_over_zip_codes(zip_codes)
   Store.where("created_at > ?", @start_time).each do |store|
     puts "#{store.name}, #{store.address}, #{store.flavors.map(&:name).join(', ')}"
