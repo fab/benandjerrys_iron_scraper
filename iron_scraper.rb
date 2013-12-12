@@ -1,12 +1,12 @@
-require_relative 'development/iron_scraper_dev.rb' unless ARGV.include?('-id')
+require_relative 'development/iron_scraper_dev' unless ARGV.include?('-id')
 require 'mechanize'
 require 'csv'
 require 'pg'
 require 'active_record'
 require 'iron_mq'
 
-require './models/store.rb'
-require './models/flavor.rb'
+require_relative 'models/store'
+require_relative 'models/flavor'
 
 def setup
   @agent = Mechanize.new
