@@ -1,0 +1,23 @@
+#USAGE: Replace the commented values with those of your Heroku databases
+
+development:
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  database: #database
+  username: #username
+  password: #password
+  host: #host
+  port: #port
+  sslmode: require
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  database: #database
+  username: #username
+  password: #password
+  host: #host
+  port: #port
+  sslmode: require
